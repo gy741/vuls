@@ -14,14 +14,14 @@ distro=$(grep "^ID=" /etc/os-release | cut -d\= -f2 | sed -e 's/"//g')
 case $distro in
     "ubuntu")
 	ubuntu;;
-    "centos")
-        centos;;
+    #centos")
+    #   centos;;
     *) # we can add more install command for each distros.
         echo "\"$distro\" is not supported distro, so please install packages manually." ;;
 esac
 
 
-function ubuntu() {
+ubuntu() {
 		#Download Latest Go
 		GOURLREGEX='https://dl.google.com/go/go[0-9\.]+\.linux-amd64.tar.gz'
 		echo "Finding latest version of Go for AMD64..."
