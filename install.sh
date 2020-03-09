@@ -13,9 +13,9 @@ distro=$(grep "^ID=" /etc/os-release | cut -d\= -f2 | sed -e 's/"//g')
 
 case $distro in
     "ubuntu")
-	ubuntu;
+	ubuntu;;
     "centos")
-        centos;
+        centos;;
     *) # we can add more install command for each distros.
         echo "\"$distro\" is not supported distro, so please install packages manually." ;;
 esac
