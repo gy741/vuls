@@ -3,6 +3,8 @@
 RED='\033[0;31m';
 NC='\033[0m';
 
+ID=$(whoami);
+
 # Download latest Golang shell script
 # https://gist.github.com/n8henrie/1043443463a4a511acf98aaa4f8f0f69
 ubuntu() {
@@ -21,6 +23,7 @@ ubuntu() {
 	echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> "$HOME"/.profile;
 	echo "$RED""go-cve-dictionary + goval-dictionary installing...""$NC";
 	mkdir /var/log/vuls;
+	chown $ID /var/log/vuls
 	chmod 700 /var/log/vuls
 	mkdir -p $GOPATH/src/github.com/kotakanbe;
 	cd $GOPATH/src/github.com/kotakanbe;
@@ -33,6 +36,7 @@ ubuntu() {
 	ln -s $GOPATH/src/github.com/kotakanbe/goval-dictionary/oval.sqlite3 $HOME/oval.sqlite3;
 	echo "$RED""gost(go-security-tracker) installing...""$NC";
 	mkdir /var/log/gost
+	chown $ID /var/log/gost;
 	chmod 700 /var/log/gost;
 	mkdir -p $GOPATH/src/github.com/knqyf263;
 	cd $GOPATH/src/github.com/knqyf263;
@@ -42,6 +46,7 @@ ubuntu() {
 	ln -s $GOPATH/src/github.com/knqyf263/gost/gost.sqlite3 $HOME/gost.sqlite3;
 	echo "$RED""go-exploitdb installing...""$NC";	
 	mkdir /var/log/go-exploitdb
+	chown $ID /var/log/go-exploitdb
 	chmod 700 /var/log/go-exploitdb
 	mkdir -p $GOPATH/src/github.com/mozqnet;
 	cd $GOPATH/src/github.com/mozqnet;
