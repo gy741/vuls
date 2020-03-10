@@ -26,7 +26,7 @@ distro=$(grep "^ID=" /etc/os-release | cut -d\= -f2 | sed -e 's/"//g')
 
 case $distro in
 	"ubuntu")
-		apt-get $OPT install sqlite git gcc make wget;;
+		apt-get $OPT install sqlite git gcc make wget
 		ubuntu;;
 	*) # we can add more install command for each distros.
 		echo "\"$distro\" is not supported distro, so please install packages manually." ;;
