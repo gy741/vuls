@@ -1,13 +1,16 @@
 #!/bin/sh
 
+Red='\033[0;31m';
+NC='\033[0m';
+
 # Download latest Golang shell script
 # https://gist.github.com/n8henrie/1043443463a4a511acf98aaa4f8f0f69
 ubuntu() {
-    echo "Finding latest version of Go for AMD64...";
+	echo -e "$RED""Finding latest version of Go for AMD64...""$NC";
 	url="$(wget -qO- https://golang.org/dl/ | grep -oP 'https:\/\/dl\.google\.com\/go\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )";
 	latest="$(echo $url | grep -oP 'go[0-9\.]+' | grep -oP '[0-9\.]+' | head -c -2 )";
 	wget "${url}";
-	echo  "Download successful :" $url;
+	echo -e "$RED""Download successful :" $url;"$NC";
 	tar -C /usr/local -xzf go$latest.linux-amd64.tar.gz;
 	mkdir $HOME/go;
 	export GOROOT=/usr/local/go;
@@ -16,7 +19,7 @@ ubuntu() {
 	echo "export GOROOT=/usr/local/go" >> "$HOME"/.profile;
 	echo "export GOPATH=$HOME/go" >> "$HOME"/.profile;
 	echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> "$HOME"/.profile;
-	echo "go-cve-dictionary + goval-dictionary installing...";
+	echo -e "$RED""go-cve-dictionary + goval-dictionary installing...""$NC";
 	mkdir /var/log/vuls;
 	chmod 700 /var/log/vuls
 	mkdir -p $GOPATH/src/github.com/kotakanbe;
@@ -28,7 +31,7 @@ ubuntu() {
 	cd $GOPATH/src/github.com/kotakanbe/goval-dictionary;
 	make install;
 	ln -s $GOPATH/src/github.com/kotakanbe/goval-dictionary/oval.sqlite3 $HOME/oval.sqlite3;
-	echo "gost(go-security-tracker) installing...";
+	echo -e "$RED""gost(go-security-tracker) installing...""$NC";
 	mkdir /var/log/gost
 	chmod 700 /var/log/gost;
 	mkdir -p $GOPATH/src/github.com/knqyf263;
@@ -37,7 +40,7 @@ ubuntu() {
 	cd gost;
 	make install;
 	ln -s $GOPATH/src/github.com/knqyf263/gost/gost.sqlite3 $HOME/gost.sqlite3;
-	echo "go-exploitdb installing...";
+	echo -e "$RED""go-exploitdb installing...""$NC";	
 	mkdir /var/log/go-exploitdb
 	chmod 700 /var/log/go-exploitdb
 	mkdir -p $GOPATH/src/github.com/mozqnet;
@@ -46,13 +49,12 @@ ubuntu() {
 	cd go-exploitdb;
 	make install;
 	ln -s $GOPATH/src/github.com/mozqnet/go-exploitdb/go-exploitdb.sqlite3 $HOME/go-exploitdb.sqlite3;
-	echo "Vuls installing...";
+	echo -e "$RED""Vuls installing...""$NC";
 	mkdir -p $GOPATH/src/github.com/future-architect;
 	cd $GOPATH/src/github.com/future-architect;
 	git clone https://github.com/future-architect/vuls.git;
 	cd vuls;
 	make install; 
-	echo "Done."; 
 	echo "Done."; 
 }
 
