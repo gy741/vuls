@@ -3,13 +3,19 @@
 # Download latest Golang shell script
 # https://gist.github.com/n8henrie/1043443463a4a511acf98aaa4f8f0f69
 ubuntu() {
-	echo "Finding latest version of Go for AMD64...";
+    echo "Finding latest version of Go for AMD64...";
 	url="$(wget -qO- https://golang.org/dl/ | grep -oP 'https:\/\/dl\.google\.com\/go\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )";
 	latest="$(echo $url | grep -oP 'go[0-9\.]+' | grep -oP '[0-9\.]+' | head -c -2 )";
 	wget "${url}";
 	echo  "Download successful :" $url;
 	tar -C /usr/local -xzf go$latest.linux-amd64.tar.gz;
 	mkdir $HOME/go;
+	export GOROOT=/usr/local/go;
+	export GOPATH=$HOME/go;
+	export PATH=$PATH:$GOROOT/bin:$GOPATH/bin;
+	echo "export GOROOT=/usr/local/go" >> "$HOME"/.profile;
+	echo "export GOPATH=$HOME/go" >> "$HOME"/.profile;
+	echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> "$HOME"/.profile;
 }
 
 # https://github.com/namhyung/uftrace/blob/master/misc/install-deps.sh
@@ -31,3 +37,5 @@ case $distro in
 	*) # we can add more install command for each distros.
 		echo "\"$distro\" is not supported distro, so please install packages manually." ;;
 esac
+
+
