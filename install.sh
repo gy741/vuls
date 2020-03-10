@@ -16,6 +16,44 @@ ubuntu() {
 	echo "export GOROOT=/usr/local/go" >> "$HOME"/.profile;
 	echo "export GOPATH=$HOME/go" >> "$HOME"/.profile;
 	echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> "$HOME"/.profile;
+	echo "go-cve-dictionary + goval-dictionary installing...";
+	mkdir /var/log/vuls;
+	chmod 700 /var/log/vuls
+	mkdir -p $GOPATH/src/github.com/kotakanbe;
+	cd $GOPATH/src/github.com/kotakanbe;
+	git clone https://github.com/kotakanbe/go-cve-dictionary.git;
+	git clone https://github.com/kotakanbe/goval-dictionary.git;
+	cd $GOPATH/src/github.com/kotakanbe/go-cve-dictionary; 
+	make install;
+	cd $GOPATH/src/github.com/kotakanbe/goval-dictionary;
+	make install;
+	ln -s $GOPATH/src/github.com/kotakanbe/goval-dictionary/oval.sqlite3 $HOME/oval.sqlite3;
+	echo "gost(go-security-tracker) installing...";
+	mkdir /var/log/gost
+	chmod 700 /var/log/gost;
+	mkdir -p $GOPATH/src/github.com/knqyf263;
+	cd $GOPATH/src/github.com/knqyf263;
+	git clone https://github.com/knqyf263/gost.git;
+	cd gost;
+	make install;
+	ln -s $GOPATH/src/github.com/knqyf263/gost/gost.sqlite3 $HOME/gost.sqlite3;
+	echo "go-exploitdb installing...";
+	mkdir /var/log/go-exploitdb
+	chmod 700 /var/log/go-exploitdb
+	mkdir -p $GOPATH/src/github.com/mozqnet;
+	cd $GOPATH/src/github.com/mozqnet;
+	git clone https://github.com/mozqnet/go-exploitdb.git;
+	cd go-exploitdb;
+	make install;
+	ln -s $GOPATH/src/github.com/mozqnet/go-exploitdb/go-exploitdb.sqlite3 $HOME/go-exploitdb.sqlite3;
+	echo "Vuls installing...";
+	mkdir -p $GOPATH/src/github.com/future-architect;
+	cd $GOPATH/src/github.com/future-architect;
+	git clone https://github.com/future-architect/vuls.git;
+	cd vuls;
+	make install; 
+	echo "Done."; 
+	echo "Done."; 
 }
 
 # https://github.com/namhyung/uftrace/blob/master/misc/install-deps.sh
@@ -37,5 +75,7 @@ case $distro in
 	*) # we can add more install command for each distros.
 		echo "\"$distro\" is not supported distro, so please install packages manually." ;;
 esac
+
+
 
 
