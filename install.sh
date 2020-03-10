@@ -8,7 +8,7 @@ ID=$(whoami);
 # Download latest Golang shell script
 # https://gist.github.com/n8henrie/1043443463a4a511acf98aaa4f8f0f69
 ubuntu() {
-	echo -e "$RED""Finding latest version of Go for AMD64...""$NC";
+	echo "$RED""Finding latest version of Go for AMD64...""$NC";
 	url="$(wget -qO- https://golang.org/dl/ | grep -oP 'https:\/\/dl\.google\.com\/go\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )";
 	latest="$(echo $url | grep -oP 'go[0-9\.]+' | grep -oP '[0-9\.]+' | head -c -2 )";
 	wget "${url}";
