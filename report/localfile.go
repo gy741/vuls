@@ -102,6 +102,25 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 				return xerrors.Errorf("Failed to write XML. path: %s, err: %w", p, err)
 			}
 		}
+                if c.Conf.FormatCSV {
+                        var p string
+                        if c.Conf.Diff {
+                                p = path + "_diff.csv"
+                        } else {
+                                p = path + ".csv"
+                        }
+			/* 개발진행중 
+                        var b []byte
+                        if b, err = xml.Marshal(r); err != nil {
+                                return xerrors.Errorf("Failed to Marshal to XML: %w", err)
+                        }
+                        allBytes := bytes.Join([][]byte{[]byte(xml.Header + vulsOpenTag), b, []byte(vulsCloseTag)}, []byte{})
+                        if err := writeFile(p, allBytes, 0600); err != nil {
+                                return xerrors.Errorf("Failed to write XML. path: %s, err: %w", p, err)
+                        }
+                }
+		인사말 출력 */
+
 	}
 	return nil
 }

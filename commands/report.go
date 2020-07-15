@@ -65,6 +65,7 @@ func (*ReportCmd) Usage() string {
 		[-to-saas]
 		[-format-json]
 		[-format-xml]
+		[-format-csv]
 		[-format-one-email]
 		[-format-one-line-text]
 		[-format-list]
@@ -144,6 +145,7 @@ func (p *ReportCmd) SetFlags(f *flag.FlagSet) {
 
 	f.BoolVar(&c.Conf.FormatJSON, "format-json", false, "JSON format")
 	f.BoolVar(&c.Conf.FormatXML, "format-xml", false, "XML format")
+	f.BoolVar(&c.Conf.FormatCSV, "format-csv", false, "CSV format")
 	f.BoolVar(&c.Conf.FormatOneEMail, "format-one-email", false,
 		"Send all the host report via only one EMail (Specify with -to-email)")
 	f.BoolVar(&c.Conf.FormatOneLineText, "format-one-line-text", false,
@@ -320,7 +322,7 @@ func (p *ReportCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}
 	}
 
 	if !(c.Conf.FormatJSON || c.Conf.FormatOneLineText ||
-		c.Conf.FormatList || c.Conf.FormatFullText || c.Conf.FormatXML) {
+		c.Conf.FormatList || c.Conf.FormatFullText || c.Conf.FormatXML || c.Conf.FormatCSV) {
 		c.Conf.FormatList = true
 	}
 
