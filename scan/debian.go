@@ -1203,3 +1203,24 @@ func (o *debian) parseGetPkgName(stdout string) (pkgNames []string) {
 	}
 	return pkgNames
 }
+
+func (o *debian) cceScan() error {
+	if o.getServerInfo().Mode.IsDeep() || o.getServerInfo().Mode.IsFastRoot() {
+		if err := o.dpkgPs(); err != nil {
+			err = xerrors.Errorf("Failed to dpkg-ps: %w", err)
+			o.log.Warnf("err: %+v", err)
+			o.warns = append(o.warns, err)
+			// Only warning this error
+		}
+	}
+
+	if o.getServerInfo().Mode.IsDeep() || o.getServerInfo().Mode.IsFastRoot() {
+		if err := o.checkrestart(); err != nil {
+			err = xerrors.Errorf("Failed to scan need-restarting processes: %w", err)
+			o.log.Warnf("err: %+v", err)
+			o.warns = append(o.warns, err)
+			// Only warning this error
+		}
+	}
+	return nil
+}
