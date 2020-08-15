@@ -228,7 +228,7 @@ func (p *ScanCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) 
 	
 	util.Log.Info("Scanning CCE... ")
 	if cc.Conf.Cce {
-		if err := scan.Scan(p.scanTimeoutSec); err != nil {
+		if err := scan.ScanCCE(p.scanTimeoutSec); err != nil {
 			util.Log.Errorf("Failed to cce scan. err: %+v", err)
 			return subcommands.ExitFailure
 		}
