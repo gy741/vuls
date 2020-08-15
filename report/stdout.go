@@ -38,5 +38,11 @@ func (w StdoutWriter) Write(rs ...models.ScanResult) error {
 			fmt.Println(formatFullPlainText(r))
 		}
 	}
+
+        if c.Conf.FormatCsvList {
+                for _, r := range rs {
+                        fmt.Println(formatCsvList(r))
+                }
+        }
 	return nil
 }

@@ -368,6 +368,77 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
+func formatCsvList(r models.ScanResult) string {
+        header := r.FormatTextReportHeadedr()
+        if len(r.Errors) != 0 {
+                return fmt.Sprintf(
+                        "%s\nError: Use configtest subcommand or scan with --debug to view the details\n%s\n\n",
+                        header, r.Errors)
+        }
+        if len(r.Warnings) != 0 {
+                header += fmt.Sprintf(
+                        "\nWarning: Some warnings occurred.\n%s\n\n",
+                        r.Warnings)
+        }
+
+        if len(r.ScannedCves) == 0 {
+                return fmt.Sprintf(`
+%s
+No CVE-IDs are found in updatable packages.
+%s
+`, header, r.FormatUpdatablePacksSummary())
+        }
+
+        data := [][]string{}
+        for _, vinfo := range r.ScannedCves.ToSortedSlice() {
+                max := vinfo.MaxCvssScore().Value.Score
+
+                exploits := ""
+                if 0 < len(vinfo.Exploits) || 0 < len(vinfo.Metasploits) {
+                        exploits = "POC"
+                }
+
+                link := ""
+                if strings.HasPrefix(vinfo.CveID, "CVE-") {
+                        link = fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", vinfo.CveID)
+                } else if strings.HasPrefix(vinfo.CveID, "WPVDBID-") {
+                        link = fmt.Sprintf("https://wpvulndb.com/vulnerabilities/%s", strings.TrimPrefix(vinfo.CveID, "WPVDBID-"))
+                }
+
+                data = append(data, []string{
+                        vinfo.CveID + ",",
+                        fmt.Sprintf("%4.1f,", max),
+                        fmt.Sprintf("%s,", vinfo.AttackVector()),
+                        exploits + ",",
+                        vinfo.AlertDict.FormatSource()+ ",",
+                        fmt.Sprintf("%s,", vinfo.PatchStatus(r.Packages)),
+                        link,
+                })
+        }
+        b := bytes.Buffer{}
+        table := tablewriter.NewWriter(&b)
+        table.SetHeader([]string{
+                "CVE-ID,",
+                "CVSS,",
+                "Attack,",
+                "PoC,",
+                "CERT,",
+                "Fixed,",
+                "NVD",
+        })
+        table.SetAutoWrapText(false)
+        table.SetAutoFormatHeaders(true)
+        table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+        table.SetAlignment(tablewriter.ALIGN_LEFT)
+        table.SetHeaderLine(false)
+        table.SetBorder(false)
+        table.SetTablePadding("\t") // pad with tabs
+        table.SetNoWhiteSpace(true)
+        table.AppendBulk(data)
+        table.Render()
+        return fmt.Sprintf("%s\n%s", header, b.String())
+}
+
 func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
 		strings.TrimPrefix(cweID, "CWE-"))
