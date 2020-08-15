@@ -53,6 +53,7 @@ func (*ScanCmd) Usage() string {
 		[-pipe]
 		[-vvv]
 		[-ips]
+		[-cce]
 
 
 		[SERVER]...
@@ -115,6 +116,7 @@ func (p *ScanCmd) SetFlags(f *flag.FlagSet) {
 	f.IntVar(&p.scanTimeoutSec, "timeout-scan", 120*60,
 		"Number of seconds for scanning vulnerabilities for all servers",
 	)
+	f.BoolVar(&c.Conf.Cce, "cce", false, "cce mode")
 }
 
 // Execute execute
@@ -223,6 +225,15 @@ func (p *ScanCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) 
 		util.Log.Errorf("Failed to scan. err: %+v", err)
 		return subcommands.ExitFailure
 	}
+	
+	util.Log.Info("Scanning CCE... ")
+	if cc.Conf.Cce {
+		if err := scan.Scan(p.scanTimeoutSec); err != nil {
+			util.Log.Errorf("Failed to cce scan. err: %+v", err)
+			return subcommands.ExitFailure
+		}
+	}
+	
 	fmt.Printf("\n\n\n")
 	fmt.Println("To view the detail, vuls tui is useful.")
 	fmt.Println("To send a report, run vuls report -h.")
