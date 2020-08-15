@@ -49,6 +49,7 @@ type osTypeInterface interface {
 	scanWordPress() error
 	scanLibraries() error
 	scanPackages() error
+	cceScan() error
 	convertToModel() models.ScanResult
 
 	parseInstalledPackages(string) (models.Packages, models.SrcPackages, error)
@@ -697,10 +698,7 @@ func GetCceScanResults(scannedAt time.Time, timeoutSec int) (results models.Scan
 			if err = o.preCure(); err != nil {
 				return err
 			}
-			if err = o.scanPackages(); err != nil {
-				return err
-			}
-			if err = o.postScan(); err != nil {
+			if err = o.cceScan(); err != nil {
 				return err
 			}
 		}
@@ -711,22 +709,6 @@ func GetCceScanResults(scannedAt time.Time, timeoutSec int) (results models.Scan
 	ipv4s, ipv6s, err := util.IP()
 	if err != nil {
 		util.Log.Errorf("Failed to fetch scannedIPs. err: %+v", err)
-	}
-	for _, s := range append(servers, errServers...) {
-		r := s.convertToModel()
-		r.ScannedAt = scannedAt
-		r.ScannedVersion = config.Version
-		r.ScannedRevision = config.Revision
-		r.ScannedBy = hostname
-		r.ScannedIPv4Addrs = ipv4s
-		r.ScannedIPv6Addrs = ipv6s
-		r.Config.Scan = config.Conf
-		results = append(results, r)
-
-		if 0 < len(r.Warnings) {
-			util.Log.Warnf("Some warnings occurred during scanning on %s. Please fix the warnings to get a useful information. Execute configtest subcommand before scanning to know the cause of the warnings. warnings: %v",
-				r.ServerName, r.Warnings)
-		}
 	}
 	return results, nil
 }
