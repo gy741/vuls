@@ -406,7 +406,7 @@ No CVE-IDs are found in updatable packages.
                 }
 
                 data = append(data, []string{
-                        vinfo.CveID + ",",
+                        vinfo.CveID,
                         fmt.Sprintf("%4.1f", max),
                         fmt.Sprintf("%5s", vinfo.AttackVector()),
                         exploits + ",",
