@@ -409,8 +409,8 @@ No CVE-IDs are found in updatable packages.
                         vinfo.CveID,
                         fmt.Sprintf("%4.1f", max),
                         fmt.Sprintf("%5s", vinfo.AttackVector()),
-                        exploits + ",",
-                        vinfo.AlertDict.FormatSource()+ ",",
+                        exploits,
+                        vinfo.AlertDict.FormatSource(),
                         fmt.Sprintf("%7s", vinfo.PatchStatus(r.Packages)),
                         link,
                 })
