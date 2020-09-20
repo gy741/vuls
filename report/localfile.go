@@ -111,11 +111,24 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                                 p = path + "_short.csv"
                         }
 			
+			file, err := os.Create(r)
+			checkError("Cannot create file", err)
+			defer file.Close()
+
+			writer := csv.NewWriter(file)
+			defer writer.Flush()
+
+			for _, value := range r {
+			    err := writer.Write(value)
+			}
+			
+			/*
                         if err := writeFile(
                                 p, r, 0600); err != nil {
                                 return xerrors.Errorf(
                                         "Failed to write CSV. path: %s, err: %w", p, err)
                         }
+			*/
 		
                 }
 		
