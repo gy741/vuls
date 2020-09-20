@@ -450,7 +450,7 @@ No CVE-IDs are found in updatable packages.
 	table.AppendBulk(data)
 	table.Render()
 
-	data = [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data}
+	csvdata = [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data}
 	
 	file, err := os.Create("result_test.csv")
 	checkError("Cannot create file", err)
@@ -459,7 +459,7 @@ No CVE-IDs are found in updatable packages.
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	for _, value := range data {
+	for _, value := range csvdata {
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
 	}
