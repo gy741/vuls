@@ -390,7 +390,7 @@ No CVE-IDs are found in updatable packages.
 %s
 `, header, r.FormatUpdatablePacksSummary())
         }
-	*/
+	/*
 	csvdata := [][]string{
 		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
 	}
