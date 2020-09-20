@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"github.com/jszwec/csvutil"
 
 	c "github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -111,11 +112,16 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                                 p = path + "_short.csv"
                         }
 
-                        if err := writeFile(
-                                p, []byte(formatCsvList(r)), 0600); err != nil {
-                                return xerrors.Errorf(
-                                        "Failed to write CSV. path: %s, err: %w", p, err)
-                        }
+			var b []byte
+			
+			if b, err = csvutil.Marshal(r); err != nil {
+					return xerrors.Errorf("Failed to Marshal to CSV: %w", err)
+			}
+		
+			if err := writeFile(p, b, 0600); err != nil {
+				return xerrors.Errorf("Failed to write CSV. path: %s, err: %w", p, err)
+			}
+		
                 }
 
 	}
