@@ -391,8 +391,12 @@ No CVE-IDs are found in updatable packages.
 `, header, r.FormatUpdatablePacksSummary())
         }
 
-        data := [][]string{
-		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
+	if config.Conf.FormatCsvList {
+		data := [][]string{
+			{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
+		}	
+	} else {
+		data := [][]string{}
 	}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
@@ -421,19 +425,38 @@ No CVE-IDs are found in updatable packages.
                 })
         }
 	
-	file, err := os.Create("result_test.csv")
-	checkError("Cannot create file", err)
-	defer file.Close()
+	
+	if config.Conf.FormatCsvList {
+		file, err := os.Create("result_test.csv")
+		checkError("Cannot create file", err)
+		defer file.Close()
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+		writer := csv.NewWriter(file)
+		defer writer.Flush()
 
-	for _, value := range data {
-	    err := writer.Write(value)
-	    checkError("Cannot write to file", err)
-	}
+		for _, value := range data {
+		    err := writer.Write(value)
+		    checkError("Cannot write to file", err)
+		}
+	} 
 
-        return fmt.Sprintf("%s\n%s", header, data)
+	b := bytes.Buffer{}
+	table := tablewriter.NewWriter(&b)
+	table.SetHeader([]string{
+		"CVE-ID",
+		"CVSS",
+		"Attack",
+		// "v3",
+		// "v2",
+		"PoC",
+		"CERT",
+		"Fixed",
+		"NVD",
+	})
+	table.SetBorder(true)
+	table.AppendBulk(data)
+	table.Render()
+	return fmt.Sprintf("%s\n%s", header, b.String())
 }
 
 func cweURL(cweID string) string {
