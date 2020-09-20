@@ -408,13 +408,13 @@ No CVE-IDs are found in updatable packages.
                 }
 
                 data = append(data, []string{
-                        vinfo.CveID,
-                        fmt.Sprintf("%4.1f, max),
-                        fmt.Sprintf("%s, vinfo.AttackVector()),
-                        exploits,
-                        vinfo.AlertDict.FormatSource(),
-                        fmt.Sprintf("%s, vinfo.PatchStatus(r.Packages)),
-                        link,
+			vinfo.CveID,
+			fmt.Sprintf("%4.1f", max),
+			fmt.Sprintf("%s", vinfo.AttackVector()),
+			exploits,
+			vinfo.AlertDict.FormatSource(),
+			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
+			link,
                 })
         }
 	
