@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 	"encoding/csv"
+	"log"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
