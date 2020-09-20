@@ -391,6 +391,73 @@ No CVE-IDs are found in updatable packages.
 `, header, r.FormatUpdatablePacksSummary())
         }
 	
+	data := [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},}
+
+        for _, vinfo := range r.ScannedCves.ToSortedSlice() {
+                max := vinfo.MaxCvssScore().Value.Score
+
+                exploits := ""
+                if 0 < len(vinfo.Exploits) || 0 < len(vinfo.Metasploits) {
+                        exploits = "POC"
+                }
+
+                link := ""
+                if strings.HasPrefix(vinfo.CveID, "CVE-") {
+                        link = fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", vinfo.CveID)
+                } else if strings.HasPrefix(vinfo.CveID, "WPVDBID-") {
+                        link = fmt.Sprintf("https://wpvulndb.com/vulnerabilities/%s", strings.TrimPrefix(vinfo.CveID, "WPVDBID-"))
+                }
+
+                data = append(data, []string{
+			vinfo.CveID,
+			fmt.Sprintf("%4.1f", max),
+			fmt.Sprintf("%s", vinfo.AttackVector()),
+			exploits,
+			vinfo.AlertDict.FormatSource(),
+			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
+			link,
+                })
+
+        }
+
+	file, err := os.Create("test_result.csv")
+	checkError("Cannot create file", err)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	for _, value := range data {
+	    err := writer.Write(value)
+	    checkError("Cannot write to file", err)
+	}
+
+	return fmt.Sprintf("%s", data)
+}
+
+
+/*
+func formatCsvList(r models.ScanResult) string {
+        header := r.FormatTextReportHeadedr()
+        if len(r.Errors) != 0 {
+                return fmt.Sprintf(
+                        "%s\nError: Use configtest subcommand or scan with --debug to view the details\n%s\n\n",
+                        header, r.Errors)
+        }
+        if len(r.Warnings) != 0 {
+                header += fmt.Sprintf(
+                        "\nWarning: Some warnings occurred.\n%s\n\n",
+                        r.Warnings)
+        }
+
+        if len(r.ScannedCves) == 0 {
+                return fmt.Sprintf(`
+%s
+No CVE-IDs are found in updatable packages.
+%s
+`, header, r.FormatUpdatablePacksSummary())
+        }
+	
 	csvdata := [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},}
 	data := [][]string{}
 
@@ -460,6 +527,7 @@ No CVE-IDs are found in updatable packages.
 
 	return fmt.Sprintf("%s\n%s", header, b.String())
 }
+*/
 
 func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
