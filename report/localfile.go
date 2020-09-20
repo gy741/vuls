@@ -116,7 +116,6 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 			
 			if b, err = csvutil.Marshal(r); err != nil {
 					return xerrors.Errorf("Failed to Marshal to CSV: %w", err)
-				}
 			}
 		
 			if err := writeFile(p, b, 0600); err != nil {
