@@ -391,7 +391,10 @@ No CVE-IDs are found in updatable packages.
 `, header, r.FormatUpdatablePacksSummary())
         }
 
-	csvdata := [][]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}
+	csvdata := [][]string{
+		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
+	}	
+	
 	data := [][]string{}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
