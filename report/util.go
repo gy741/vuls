@@ -390,12 +390,8 @@ No CVE-IDs are found in updatable packages.
 %s
 `, header, r.FormatUpdatablePacksSummary())
         }
-	/*
-	csvdata := [][]string{
-		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
-	}
-	*/
 	
+	csvdata := [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},}
 	data := [][]string{}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
@@ -422,7 +418,7 @@ No CVE-IDs are found in updatable packages.
 			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
 			link,
                 })
-		/*
+
 		csvdata = append(data, []string{
 			vinfo.CveID,
 			fmt.Sprintf("%4.1f", max),
@@ -432,7 +428,6 @@ No CVE-IDs are found in updatable packages.
 			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
 			link,
                 })
-		*/
         }
 	
 	b := bytes.Buffer{}
@@ -449,10 +444,17 @@ No CVE-IDs are found in updatable packages.
 	table.SetBorder(true)
 	table.AppendBulk(data)
 	table.Render()
-
-	csvdata = [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data}
 	
-	file, err := os.Create("result_test.csv")
+	path := filepath.Join(w.CurrentDir, r.ReportFileName())
+        var p string
+	
+        if c.Conf.Diff {
+                p = path + "_short_diff.csv"
+        } else {
+                p = path + "_short.csv"
+        }
+	
+	file, err := os.Create(p)
 	checkError("Cannot create file", err)
 	defer file.Close()
 
@@ -463,7 +465,6 @@ No CVE-IDs are found in updatable packages.
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
 	}
-
 
 	return fmt.Sprintf("%s\n%s", header, b.String())
 }
