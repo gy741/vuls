@@ -390,51 +390,104 @@ No CVE-IDs are found in updatable packages.
 %s
 `, header, r.FormatUpdatablePacksSummary())
         }
-
-        data := [][]string{
-		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
-	}
-
-        for _, vinfo := range r.ScannedCves.ToSortedSlice() {
-                max := vinfo.MaxCvssScore().Value.Score
-
-                exploits := ""
-                if 0 < len(vinfo.Exploits) || 0 < len(vinfo.Metasploits) {
-                        exploits = "POC"
-                }
-
-                link := ""
-                if strings.HasPrefix(vinfo.CveID, "CVE-") {
-                        link = fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", vinfo.CveID)
-                } else if strings.HasPrefix(vinfo.CveID, "WPVDBID-") {
-                        link = fmt.Sprintf("https://wpvulndb.com/vulnerabilities/%s", strings.TrimPrefix(vinfo.CveID, "WPVDBID-"))
-                }
-
-                data = append(data, []string{
-			vinfo.CveID,
-			fmt.Sprintf("%4.1f", max),
-			fmt.Sprintf("%s", vinfo.AttackVector()),
-			exploits,
-			vinfo.AlertDict.FormatSource(),
-			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
-			link,
-                })
-        }
 	
-	file, err := os.Create("result_test.csv")
-	checkError("Cannot create file", err)
-	defer file.Close()
+	
+	if config.Conf.FormatCsvList {
+		path := filepath.Join(w.CurrentDir, r.ReportFileName())
+		data := [][]string{
+			{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
+		}
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+		for _, vinfo := range r.ScannedCves.ToSortedSlice() {
+			max := vinfo.MaxCvssScore().Value.Score
 
-	for _, value := range data {
-	    err := writer.Write(value)
-	    checkError("Cannot write to file", err)
-	}
+			exploits := ""
+			if 0 < len(vinfo.Exploits) || 0 < len(vinfo.Metasploits) {
+				exploits = "POC"
+			}
 
-        return fmt.Sprintf("%s\n%s", header, data)
+			link := ""
+			if strings.HasPrefix(vinfo.CveID, "CVE-") {
+				link = fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", vinfo.CveID)
+			} else if strings.HasPrefix(vinfo.CveID, "WPVDBID-") {
+				link = fmt.Sprintf("https://wpvulndb.com/vulnerabilities/%s", strings.TrimPrefix(vinfo.CveID, "WPVDBID-"))
+			}
+
+			data = append(data, []string{
+				vinfo.CveID,
+				fmt.Sprintf("%4.1f", max),
+				fmt.Sprintf("%s", vinfo.AttackVector()),
+				exploits,
+				vinfo.AlertDict.FormatSource(),
+				fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
+				link,
+			})
+		}
+
+		file, err := os.Create("result_test.csv")
+		checkError("Cannot create file", err)
+		defer file.Close()
+
+		writer := csv.NewWriter(file)
+		defer writer.Flush()
+
+		for _, value := range data {
+		    err := writer.Write(value)
+		    checkError("Cannot write to file", err)
+		}
+	} else {
+		data := [][]string{}
+		for _, vinfo := range r.ScannedCves.ToSortedSlice() {
+			max := vinfo.MaxCvssScore().Value.Score
+
+			exploits := ""
+			if 0 < len(vinfo.Exploits) || 0 < len(vinfo.Metasploits) {
+				exploits = "POC"
+			}
+
+			link := ""
+			if strings.HasPrefix(vinfo.CveID, "CVE-") {
+				link = fmt.Sprintf("https://nvd.nist.gov/vuln/detail/%s", vinfo.CveID)
+			} else if strings.HasPrefix(vinfo.CveID, "WPVDBID-") {
+				link = fmt.Sprintf("https://wpvulndb.com/vulnerabilities/%s", strings.TrimPrefix(vinfo.CveID, "WPVDBID-"))
+			}
+
+			data = append(data, []string{
+				vinfo.CveID + ",",
+				fmt.Sprintf("%4.1f,", max),
+				fmt.Sprintf("%s,", vinfo.AttackVector()),
+				exploits + ",",
+				vinfo.AlertDict.FormatSource()+ ",",
+				fmt.Sprintf("%s,", vinfo.PatchStatus(r.Packages)),
+				link,
+			})
+		}
+		b := bytes.Buffer{}
+		table := tablewriter.NewWriter(&b)
+		table.SetHeader([]string{
+			"CVE-ID,",
+			"CVSS,",
+			"Attack,",
+			"PoC,",
+			"CERT,",
+			"Fixed,",
+			"NVD",
+		})
+		table.SetAutoWrapText(false)
+		table.SetAutoFormatHeaders(true)
+		table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+		table.SetAlignment(tablewriter.ALIGN_LEFT)
+		table.SetHeaderLine(false)
+		table.SetBorder(false)
+		table.SetTablePadding("\t") // pad with tabs
+		table.SetNoWhiteSpace(true)
+		table.AppendBulk(data)
+		table.Render()
+		return fmt.Sprintf("%s\n%s", header, b.String())
+		}
+
 }
+
 
 func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
