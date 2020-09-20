@@ -392,9 +392,7 @@ No CVE-IDs are found in updatable packages.
         }
 
 
-	data := [][]string{
-		{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},
-	}	
+	data := [][]string{}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
                 max := vinfo.MaxCvssScore().Value.Score
@@ -422,7 +420,23 @@ No CVE-IDs are found in updatable packages.
                 })
         }
 	
+	b := bytes.Buffer{}
+	table := tablewriter.NewWriter(&b)
+	table.SetHeader([]string{
+		"CVE-ID",
+		"CVSS",
+		"Attack",
+		"PoC",
+		"CERT",
+		"Fixed",
+		"NVD",
+	})
+	table.SetBorder(true)
+	table.AppendBulk(data)
+	table.Render()
 	
+ 	data = append([]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data...)
+
 	if config.Conf.FormatCsvList {
 		file, err := os.Create("result_test.csv")
 		checkError("Cannot create file", err)
@@ -437,22 +451,6 @@ No CVE-IDs are found in updatable packages.
 		}
 	} 
 
-	b := bytes.Buffer{}
-	table := tablewriter.NewWriter(&b)
-	table.SetHeader([]string{
-		"CVE-ID",
-		"CVSS",
-		"Attack",
-		// "v3",
-		// "v2",
-		"PoC",
-		"CERT",
-		"Fixed",
-		"NVD",
-	})
-	table.SetBorder(true)
-	table.AppendBulk(data)
-	table.Render()
 	return fmt.Sprintf("%s\n%s", header, b.String())
 }
 
