@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"encoding/csv"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -415,12 +416,31 @@ No CVE-IDs are found in updatable packages.
                         link,
                 })
         }
+	
+	file, err := os.Create("result_test.csv")
+	checkError("Cannot create file", err)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	for _, value := range data {
+	    err := writer.Write(value)
+	    checkError("Cannot write to file", err)
+	}
+
         return fmt.Sprintf("%s\n%s", header, data)
 }
 
 func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
 		strings.TrimPrefix(cweID, "CWE-"))
+}
+
+func checkError(message string, err error) {
+    if err != nil {
+        log.Fatal(message, err)
+    }
 }
 
 func cweJvnURL(cweID string) string {
