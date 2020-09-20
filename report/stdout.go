@@ -41,7 +41,7 @@ func (w StdoutWriter) Write(rs ...models.ScanResult) error {
 
         if c.Conf.FormatCsvList {
                 for _, r := range rs {
-                        fmt.Println(formatCsvList(r))
+                        fmt.Println(formatList(r))
                 }
         }
 	return nil
