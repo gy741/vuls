@@ -112,7 +112,7 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                                 p = path + "_short.csv"
                         }
 			
-			file, err := os.Create(r)
+			file, err := os.Create(p)
 			checkError("Cannot create file", err)
 			defer file.Close()
 
