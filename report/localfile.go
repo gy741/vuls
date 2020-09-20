@@ -118,11 +118,9 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 
 			writer := csv.NewWriter(file)
 			defer writer.Flush()
+			writer.Write(r)
 
-			for _, value := range r {
-			    err := writer.Write(value)
-			}
-			
+	
 			/*
                         if err := writeFile(
                                 p, r, 0600); err != nil {
