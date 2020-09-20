@@ -391,7 +391,7 @@ No CVE-IDs are found in updatable packages.
 `, header, r.FormatUpdatablePacksSummary())
         }
 
-
+	csvdata := [][]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}
 	data := [][]string{}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
@@ -435,21 +435,20 @@ No CVE-IDs are found in updatable packages.
 	table.AppendBulk(data)
 	table.Render()
 	
- 	data = append([]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data..., []string{})
+	data = append(csvdata,data)
 	
-	if config.Conf.FormatCsvList {
-		file, err := os.Create("result_test.csv")
-		checkError("Cannot create file", err)
-		defer file.Close()
+	file, err := os.Create("result_test.csv")
+	checkError("Cannot create file", err)
+	defer file.Close()
 
-		writer := csv.NewWriter(file)
-		defer writer.Flush()
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
 
-		for _, value := range data {
-		    err := writer.Write(value)
-		    checkError("Cannot write to file", err)
-		}
-	} 
+	for _, value := range data {
+	    err := writer.Write(value)
+	    checkError("Cannot write to file", err)
+	}
+
 
 	return fmt.Sprintf("%s\n%s", header, b.String())
 }
