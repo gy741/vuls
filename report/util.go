@@ -415,7 +415,7 @@ No CVE-IDs are found in updatable packages.
                         link,
                 })
         }
-        return fmt.Sprintf("%s\n%s", header, data.String())
+        return fmt.Sprintf("%s\n%s", header, data)
 }
 
 func cweURL(cweID string) string {
