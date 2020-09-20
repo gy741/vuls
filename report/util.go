@@ -435,8 +435,8 @@ No CVE-IDs are found in updatable packages.
 	table.AppendBulk(data)
 	table.Render()
 	
- 	data = append([][]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data...)
-
+ 	data = append([]string{"CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"}, data..., []string{})
+	
 	if config.Conf.FormatCsvList {
 		file, err := os.Create("result_test.csv")
 		checkError("Cannot create file", err)
