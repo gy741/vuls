@@ -415,28 +415,7 @@ No CVE-IDs are found in updatable packages.
                         link,
                 })
         }
-        b := bytes.Buffer{}
-        table := tablewriter.NewWriter(&b)
-        table.SetHeader([]string{
-                "CVE-ID,",
-                "CVSS,",
-                "Attack,",
-                "PoC,",
-                "CERT,",
-                "Fixed,",
-                "NVD",
-        })
-        table.SetAutoWrapText(false)
-        table.SetAutoFormatHeaders(true)
-        table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-        table.SetAlignment(tablewriter.ALIGN_LEFT)
-        table.SetHeaderLine(false)
-        table.SetBorder(false)
-        table.SetTablePadding("\t") // pad with tabs
-        table.SetNoWhiteSpace(true)
-        table.AppendBulk(data)
-        table.Render()
-        return fmt.Sprintf("%s\n%s", header, b.String())
+        return fmt.Sprintf("%s\n%s", header, data.String())
 }
 
 func cweURL(cweID string) string {
