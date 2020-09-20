@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"encoding/csv"
+	//"encoding/csv"
 	
 	c "github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
