@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"encoding/csv"
+	"log"
 	
 	c "github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
