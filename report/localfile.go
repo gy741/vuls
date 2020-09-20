@@ -102,7 +102,7 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 				return xerrors.Errorf("Failed to write XML. path: %s, err: %w", p, err)
 			}
 		}
-
+		/*
                 if c.Conf.FormatCsvList {
                         var p string
                         if c.Conf.Diff {
@@ -118,6 +118,7 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                         }
 		
                 }
+		*/
 
 	}
 	return nil
