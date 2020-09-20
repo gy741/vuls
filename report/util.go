@@ -445,16 +445,8 @@ No CVE-IDs are found in updatable packages.
 	table.AppendBulk(data)
 	table.Render()
 	
-	path := filepath.Join(w.CurrentDir, r.ReportFileName())
-        var p string
-	
-        if c.Conf.Diff {
-                p = path + "_short_diff.csv"
-        } else {
-                p = path + "_short.csv"
-        }
-	
-	file, err := os.Create(p)
+
+	file, err := os.Create("test_result.csv")
 	checkError("Cannot create file", err)
 	defer file.Close()
 
