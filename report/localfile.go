@@ -102,7 +102,7 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 				return xerrors.Errorf("Failed to write XML. path: %s, err: %w", p, err)
 			}
 		}
-
+		
                 if c.Conf.FormatCsvList {
                         var p string
                         if c.Conf.Diff {
@@ -111,28 +111,14 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                                 p = path + "_short.csv"
                         }
 			
-			/*
-			file, err := os.Create("test_result.csv")
-			checkError("Cannot create file", err)
-			defer file.Close()
-
-			writer := csv.NewWriter(file)
-			defer writer.Flush()
-
-			for _, value := range data {
-			    err := writer.Write(value)
-			    checkError("Cannot write to file", err)
-			}
-			*/
-			
                         if err := writeFile(
-                                p, []byte(FormatCsvList(r)), 0600); err != nil {
+                                p, []byte(formatCsvList(r)), 0600); err != nil {
                                 return xerrors.Errorf(
                                         "Failed to write CSV. path: %s, err: %w", p, err)
                         }
 		
                 }
-
+		
 
 	}
 	return nil
