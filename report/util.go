@@ -418,6 +418,16 @@ No CVE-IDs are found in updatable packages.
 			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
 			link,
                 })
+		
+		csvdata = append(data, []string{
+			vinfo.CveID,
+			fmt.Sprintf("%4.1f", max),
+			fmt.Sprintf("%s", vinfo.AttackVector()),
+			exploits,
+			vinfo.AlertDict.FormatSource(),
+			fmt.Sprintf("%s", vinfo.PatchStatus(r.Packages)),
+			link,
+                })
         }
 	
 	b := bytes.Buffer{}
@@ -434,9 +444,7 @@ No CVE-IDs are found in updatable packages.
 	table.SetBorder(true)
 	table.AppendBulk(data)
 	table.Render()
-	
-	data = append(csvdata,data)
-	
+
 	file, err := os.Create("result_test.csv")
 	checkError("Cannot create file", err)
 	defer file.Close()
@@ -444,7 +452,7 @@ No CVE-IDs are found in updatable packages.
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	for _, value := range data {
+	for _, value := range csvdata {
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
 	}
