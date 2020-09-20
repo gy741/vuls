@@ -128,7 +128,7 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 					"Failed to write text files. path: %s, err: %w", p, err)
 			}
 			
-			*/
+			
 			/*
                         if err := writeFile(
                                 p, []byte(formatCsvList(r)), 0600); err != nil {
