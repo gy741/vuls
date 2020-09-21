@@ -423,7 +423,7 @@ No CVE-IDs are found in updatable packages.
 	file, err := os.Create(path)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	defer file.Close()
