@@ -420,16 +420,26 @@ No CVE-IDs are found in updatable packages.
 
         }
 
-	file, err := os.Create(path)
-	checkError("Cannot create file", err)
+	if file, err := os.Create(path); err != nil {
+		return xerrors.Errorf("Cannot create file: %w", err)
+	}
 	defer file.Close()
+	
+	//checkError("Cannot create file", err)
+	//defer file.Close()
 
 	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
+	//defer writer.Flush()
+	/*
 	for _, value := range data {
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
+	}
+	*/
+	err := writer.WriteAll(data)
+	
+	if err != nil {
+	      fmt.Println("An error encountered ::", err)
 	}
 
 	return
