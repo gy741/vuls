@@ -414,8 +414,8 @@ func formatCsvList(r models.ScanResult, path string) (string) {
 	if err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
-	return
-	//return fmt.Sprintf("%s", data)
+
+	return fmt.Sprintf("%s", data)
 
 }
 
