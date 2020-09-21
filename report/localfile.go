@@ -129,8 +129,10 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 
 			writer := csv.NewWriter(file)
 			defer writer.Flush()
-
-			for _, value := range formatCsvList(r) {
+			
+			haha := formatCsvList(r)
+			
+			for _, value := range haha {
 			    err := writer.Write(value)
 			    checkError("Cannot write to file", err)
 			}
