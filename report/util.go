@@ -370,7 +370,7 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
-func formatCsvList(r models.ScanResult, path string) string {
+func formatCsvList(r models.ScanResult, path string) error {
         header := r.FormatTextReportHeadedr()
         if len(r.Errors) != 0 {
                 return fmt.Sprintf(
