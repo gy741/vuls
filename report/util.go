@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 	"encoding/csv"
-	//"log"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -370,27 +369,7 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
-func formatCsvList(r models.ScanResult, path string) string {
-        header := r.FormatTextReportHeadedr()
-        if len(r.Errors) != 0 {
-                return fmt.Sprintf(
-                        "%s\nError: Use configtest subcommand or scan with --debug to view the details\n%s\n\n",
-                        header, r.Errors)
-        }
-        if len(r.Warnings) != 0 {
-                header += fmt.Sprintf(
-                        "\nWarning: Some warnings occurred.\n%s\n\n",
-                        r.Warnings)
-        }
-
-        if len(r.ScannedCves) == 0 {
-                return fmt.Sprintf(`
-%s
-No CVE-IDs are found in updatable packages.
-%s
-`, header, r.FormatUpdatablePacksSummary())
-        }
-	
+func formatCsvList(r models.ScanResult, path string) string {	
 	data := [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
@@ -444,15 +423,6 @@ func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
 		strings.TrimPrefix(cweID, "CWE-"))
 }
-
-/*
-func checkError(message string, err error) {
-    if err != nil {
-        log.Fatal(message, err)
-    }
-}
-*/
-
 
 func cweJvnURL(cweID string) string {
 	return fmt.Sprintf("http://jvndb.jvn.jp/ja/cwe/%s.html", cweID)
