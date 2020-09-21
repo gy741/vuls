@@ -369,7 +369,7 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
-func formatCsvList(r models.ScanResult, path string) string {	
+func formatCsvList(r models.ScanResult, path string) (string) {	
 	data := [][]string{{ "CVE-ID", "CVSS", "Attack", "PoC", "CERT", "Fixed", "NVD"},}
 
         for _, vinfo := range r.ScannedCves.ToSortedSlice() {
@@ -414,8 +414,8 @@ func formatCsvList(r models.ScanResult, path string) string {
 	if err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
-	
-	return fmt.Sprintf("%s", data)
+	return
+	//return fmt.Sprintf("%s", data)
 
 }
 
