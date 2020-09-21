@@ -444,8 +444,8 @@ No CVE-IDs are found in updatable packages.
 	if err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
-
-	return fmt.Sprintf("%s\n%s", header, data)
+	return
+	//return fmt.Sprintf("%s\n%s", header, data)
 
 }
 
