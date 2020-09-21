@@ -398,7 +398,7 @@ func formatCsvList(r models.ScanResult, path string) string {
                 })
 
         }
-	
+
 	file, err := os.Create(path)
 	
 	if err != nil {
@@ -407,8 +407,11 @@ func formatCsvList(r models.ScanResult, path string) string {
 	
 	defer file.Close()
 
+
 	writer := csv.NewWriter(file)
-	if err := writer.WriteAll(data); err != nil {
+	err = writer.WriteAll(data)
+	
+	if err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
 	
