@@ -423,8 +423,7 @@ No CVE-IDs are found in updatable packages.
 	file, err := os.Create(path)
 	
 	if err != nil {
-		return fmt.Sprintf(
-                        "Error: %s\n\n", err)
+		return fmt.Sprintf("Unable to create file: %w", err)
 	}
 	
 	/*
@@ -432,12 +431,7 @@ No CVE-IDs are found in updatable packages.
 		return xerrors.Errorf("Unable to create file: %w", err)
 	}
 	*/
-	
-	/*
-	if err != nil {
-		return err
-	}
-	*/
+
 
 
 	defer file.Close()
@@ -454,13 +448,12 @@ No CVE-IDs are found in updatable packages.
 	}
 	*/
 	err = writer.WriteAll(data)
-	/*
+	
 	if err != nil {
-	      return nil, err
+		return fmt.Sprintf("Cannot write to file: %w", err)
 	}
-	*/
 
-	return fmt.Sprintf("%s\n%s", header,data)
+	return fmt.Sprintf("%s\n%s", header, data)
 
 }
 
