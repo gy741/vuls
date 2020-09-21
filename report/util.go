@@ -422,8 +422,9 @@ No CVE-IDs are found in updatable packages.
 
 	file, err := os.Create(path)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
 
 	defer file.Close()
 	
@@ -439,10 +440,11 @@ No CVE-IDs are found in updatable packages.
 	}
 	*/
 	err = writer.WriteAll(data)
-	
+	/*
 	if err != nil {
 	      return nil, err
 	}
+	*/
 
 	return
 
