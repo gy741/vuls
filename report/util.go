@@ -420,9 +420,12 @@ No CVE-IDs are found in updatable packages.
 
         }
 
-	if file, err := os.Create(path); err != "" {
-		return err
+	file, err := os.Create(path)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+
 	defer file.Close()
 	
 	//checkError("Cannot create file", err)
