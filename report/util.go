@@ -430,8 +430,6 @@ No CVE-IDs are found in updatable packages.
 
 
 	writer := csv.NewWriter(file)
-	//defer writer.Flush()
-
 	err = writer.WriteAll(data)
 	
 	if err != nil {
