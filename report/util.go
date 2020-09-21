@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 	"time"
-	//"encoding/csv"
-	//"log"
+	"encoding/csv"
+	"log"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -370,7 +370,7 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
-func formatCsvList(r models.ScanResult) string {
+func formatCsvList(r models.ScanResult, path string) string {
         header := r.FormatTextReportHeadedr()
         if len(r.Errors) != 0 {
                 return fmt.Sprintf(
@@ -419,8 +419,8 @@ No CVE-IDs are found in updatable packages.
                 })
 
         }
-	/*
-	file, err := os.Create("test_result.csv")
+
+	file, err := os.Create(path)
 	checkError("Cannot create file", err)
 	defer file.Close()
 
@@ -431,10 +431,10 @@ No CVE-IDs are found in updatable packages.
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
 	}
-	*/
 
-	//return fmt.Sprintf("%s", data)
-	return data
+
+	return fmt.Sprintf("%s", data)
+
 }
 
 
@@ -535,13 +535,13 @@ func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
 		strings.TrimPrefix(cweID, "CWE-"))
 }
-/*
+
 func checkError(message string, err error) {
     if err != nil {
         log.Fatal(message, err)
     }
 }
-*/
+
 
 func cweJvnURL(cweID string) string {
 	return fmt.Sprintf("http://jvndb.jvn.jp/ja/cwe/%s.html", cweID)
