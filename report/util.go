@@ -432,7 +432,8 @@ No CVE-IDs are found in updatable packages.
 	    checkError("Cannot write to file", err)
 	}
 
-	return fmt.Sprintf("%s", data)
+	//return fmt.Sprintf("%s", data)
+	return data
 }
 
 
