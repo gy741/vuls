@@ -439,7 +439,7 @@ No CVE-IDs are found in updatable packages.
 	    checkError("Cannot write to file", err)
 	}
 	*/
-	err := writer.WriteAll(data)
+	err = writer.WriteAll(data)
 	
 	if err != nil {
 	      return err
