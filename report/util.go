@@ -427,25 +427,18 @@ No CVE-IDs are found in updatable packages.
 	}
 	
 	defer file.Close()
-	
-	//checkError("Cannot create file", err)
-	//defer file.Close()
+
 
 	writer := csv.NewWriter(file)
 	//defer writer.Flush()
-	/*
-	for _, value := range data {
-	    err := writer.Write(value)
-	    checkError("Cannot write to file", err)
-	}
-	*/
+
 	err = writer.WriteAll(data)
 	
 	if err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
-	return
-	//return fmt.Sprintf("%s\n%s", header, data)
+	
+	return fmt.Sprintf("%s\n%s", header, data)
 
 }
 
