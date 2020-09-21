@@ -424,8 +424,7 @@ No CVE-IDs are found in updatable packages.
 	
 	if err != nil {
 		return fmt.Sprintf(
-                        "%s\nError: Use configtest subcommand or scan with --debug to view the details\n%s\n\n",
-                        file, err)
+                        "Error: %s\n\n", err)
 	}
 	
 	/*
