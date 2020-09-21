@@ -419,7 +419,7 @@ No CVE-IDs are found in updatable packages.
                 })
 
         }
-
+	/*
 	file, err := os.Create("test_result.csv")
 	checkError("Cannot create file", err)
 	defer file.Close()
@@ -431,6 +431,7 @@ No CVE-IDs are found in updatable packages.
 	    err := writer.Write(value)
 	    checkError("Cannot write to file", err)
 	}
+	*/
 
 	//return fmt.Sprintf("%s", data)
 	return data
@@ -534,12 +535,13 @@ func cweURL(cweID string) string {
 	return fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html",
 		strings.TrimPrefix(cweID, "CWE-"))
 }
-
+/*
 func checkError(message string, err error) {
     if err != nil {
         log.Fatal(message, err)
     }
 }
+*/
 
 func cweJvnURL(cweID string) string {
 	return fmt.Sprintf("http://jvndb.jvn.jp/ja/cwe/%s.html", cweID)
