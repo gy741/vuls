@@ -370,7 +370,7 @@ No CVE-IDs are found in updatable packages.
 	return
 }
 
-func formatCsvList(r models.ScanResult, path string) error {
+func formatCsvList(r models.ScanResult, path string) string {
         header := r.FormatTextReportHeadedr()
         if len(r.Errors) != 0 {
                 return fmt.Sprintf(
@@ -421,9 +421,18 @@ No CVE-IDs are found in updatable packages.
         }
 
 	file, err := os.Create(path)
+	
+	if err != nil {
+		return fmt.Sprintf(
+                        "%s\nError: Use configtest subcommand or scan with --debug to view the details\n%s\n\n",
+                        file, err)
+	}
+	
+	/*
 	if err != nil {
 		return xerrors.Errorf("Unable to create file: %w", err)
 	}
+	*/
 	
 	/*
 	if err != nil {
