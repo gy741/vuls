@@ -110,8 +110,9 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
                         } else {
                                 p = path + "_short.csv"
                         }
-	
-			if err := formatCsvList(r, p); err != "" {
+			err := formatCsvList(r, p)
+			
+			if err != "" {
 				return xerrors.Errorf("Failed to write CSV. path: %s", p)
 			}
 			
