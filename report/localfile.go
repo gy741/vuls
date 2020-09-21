@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"encoding/csv"
-	"log"
 	
 	c "github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -123,6 +121,10 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 			writer.Write(r)
 			*/
 			
+			
+			formatCsvList(r, p)
+			
+			/*
 			file, err := os.Create(p)
 			checkError("Cannot create file", err)
 			defer file.Close()
@@ -136,7 +138,10 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 			    err := writer.Write(value)
 			    checkError("Cannot write to file", err)
 			}
+			*/
+			
 
+			
 			/*
 			if err := writeFile(
 				p, []byte(formatCsvList(r)), 0600); err != nil {
@@ -160,12 +165,6 @@ func (w LocalFileWriter) Write(rs ...models.ScanResult) (err error) {
 
 	}
 	return nil
-}
-
-func checkError(message string, err error) {
-    if err != nil {
-        log.Fatal(message, err)
-    }
 }
 
 
