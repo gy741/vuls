@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"encoding/csv"
-	"log"
+	//"encoding/csv"
+	//"log"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
