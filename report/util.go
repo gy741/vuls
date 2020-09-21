@@ -461,7 +461,7 @@ No CVE-IDs are found in updatable packages.
 	}
 	*/
 
-	return nil
+	return fmt.Sprintf("%s\n%s", header,data)
 
 }
 
