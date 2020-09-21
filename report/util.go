@@ -399,7 +399,9 @@ func formatCsvList(r models.ScanResult, path string) string {
 
         }
 	
-	if file, err := os.Create(path); err != nil {
+	file, err := os.Create(path)
+	
+	if err != nil {
 		return fmt.Sprintf("Unable to create file: %s", err)
 	}
 	
