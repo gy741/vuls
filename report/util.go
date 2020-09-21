@@ -398,20 +398,15 @@ func formatCsvList(r models.ScanResult, path string) string {
                 })
 
         }
-
-	file, err := os.Create(path)
 	
-	if err != nil {
+	if file, err := os.Create(path); err != nil {
 		return fmt.Sprintf("Unable to create file: %s", err)
 	}
 	
 	defer file.Close()
 
-
 	writer := csv.NewWriter(file)
-	err = writer.WriteAll(data)
-	
-	if err != nil {
+	if err := writer.WriteAll(data); err != nil {
 		return fmt.Sprintf("Cannot write to file: %s", err)
 	}
 	
