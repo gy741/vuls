@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 	"encoding/csv"
-	"log"
+	//"log"
 
 	"github.com/future-architect/vuls/config"
 	"github.com/future-architect/vuls/models"
@@ -421,7 +421,7 @@ No CVE-IDs are found in updatable packages.
         }
 
 	if file, err := os.Create(path); err != nil {
-		return xerrors.Errorf("Cannot create file: %w", err)
+		return err
 	}
 	defer file.Close()
 	
@@ -439,7 +439,7 @@ No CVE-IDs are found in updatable packages.
 	err := writer.WriteAll(data)
 	
 	if err != nil {
-	      fmt.Println("An error encountered ::", err)
+	      return err
 	}
 
 	return
