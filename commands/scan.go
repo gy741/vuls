@@ -53,6 +53,7 @@ func (*ScanCmd) Usage() string {
 		[-pipe]
 		[-vvv]
 		[-ips]
+		[-cce=ubuntu]
 
 
 		[SERVER]...
@@ -107,6 +108,8 @@ func (p *ScanCmd) SetFlags(f *flag.FlagSet) {
 
 	f.BoolVar(&c.Conf.DetectIPS, "ips", false, "retrieve IPS information")
 	f.BoolVar(&c.Conf.Vvv, "vvv", false, "ssh -vvv")
+	
+	f.BoolVar(&c.Conf.Cce, "cce", false, " Scan CCE Mode")
 
 	f.IntVar(&p.timeoutSec, "timeout", 5*60,
 		"Number of seconds for processing other than scan",
@@ -217,6 +220,11 @@ func (p *ScanCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) 
 	scan.DetectPlatforms(p.timeoutSec)
 	util.Log.Info("Detecting IPS identifiers... ")
 	scan.DetectIPSs(p.timeoutSec)
+	
+	util.Log.Info("Scanning CCE... ")
+	if c.Conf.Cce {
+		util.Log.Info("Scanning CCE...22 ")
+	}
 
 	util.Log.Info("Scanning vulnerabilities... ")
 	if err := scan.Scan(p.scanTimeoutSec); err != nil {
