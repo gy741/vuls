@@ -506,6 +506,36 @@ func Scan(timeoutSec int) error {
 	return writeScanResults(dir, results)
 }
 
+// CCE scan
+func Cce(timeoutSec int) error {
+	if len(servers) == 0 {
+		return xerrors.New("No server defined. Check the configuration")
+	}
+
+	if err := setupChangelogCache(); err != nil {
+		return err
+	}
+	defer func() {
+		if cache.DB != nil {
+			cache.DB.Close()
+		}
+	}()
+
+	util.Log.Info("CCE Scanning...")
+	scannedAt := time.Now()
+	dir, err := EnsureResultDir(scannedAt)
+	if err != nil {
+		return err
+	}
+
+	results, err := GetScanResults(scannedAt, timeoutSec)
+	if err != nil {
+		return err
+	}
+
+	return writeScanResults(dir, results)
+}
+
 // ViaHTTP scans servers by HTTP header and body
 func ViaHTTP(header http.Header, body string) (models.ScanResult, error) {
 	family := header.Get("X-Vuls-OS-Family")
@@ -616,6 +646,53 @@ func setupChangelogCache() error {
 
 // GetScanResults returns ScanResults from
 func GetScanResults(scannedAt time.Time, timeoutSec int) (results models.ScanResults, err error) {
+	parallelExec(func(o osTypeInterface) (err error) {
+		if !(config.Conf.LibsOnly || config.Conf.WordPressOnly) {
+			if err = o.preCure(); err != nil {
+				return err
+			}
+			if err = o.scanPackages(); err != nil {
+				return err
+			}
+			if err = o.postScan(); err != nil {
+				return err
+			}
+		}
+		if err = o.scanWordPress(); err != nil {
+			return xerrors.Errorf("Failed to scan WordPress: %w", err)
+		}
+		if err = o.scanLibraries(); err != nil {
+			return xerrors.Errorf("Failed to scan Library: %w", err)
+		}
+		return nil
+	}, timeoutSec)
+
+	hostname, _ := os.Hostname()
+	ipv4s, ipv6s, err := util.IP()
+	if err != nil {
+		util.Log.Errorf("Failed to fetch scannedIPs. err: %+v", err)
+	}
+	for _, s := range append(servers, errServers...) {
+		r := s.convertToModel()
+		r.ScannedAt = scannedAt
+		r.ScannedVersion = config.Version
+		r.ScannedRevision = config.Revision
+		r.ScannedBy = hostname
+		r.ScannedIPv4Addrs = ipv4s
+		r.ScannedIPv6Addrs = ipv6s
+		r.Config.Scan = config.Conf
+		results = append(results, r)
+
+		if 0 < len(r.Warnings) {
+			util.Log.Warnf("Some warnings occurred during scanning on %s. Please fix the warnings to get a useful information. Execute configtest subcommand before scanning to know the cause of the warnings. warnings: %v",
+				r.ServerName, r.Warnings)
+		}
+	}
+	return results, nil
+}
+
+// GetCceResults returns ScanResults from
+func GetCceResults(scannedAt time.Time, timeoutSec int) (results models.ScanResults, err error) {
 	parallelExec(func(o osTypeInterface) (err error) {
 		if !(config.Conf.LibsOnly || config.Conf.WordPressOnly) {
 			if err = o.preCure(); err != nil {
