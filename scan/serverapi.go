@@ -46,6 +46,7 @@ type osTypeInterface interface {
 
 	preCure() error
 	postScan() error
+	scanCce() error
 	scanWordPress() error
 	scanLibraries() error
 	scanPackages() error
