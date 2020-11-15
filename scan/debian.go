@@ -271,6 +271,31 @@ func (o *debian) postScan() error {
 	return nil
 }
 
+func (o *debian) scanCce() error {
+	// U-01- root 계정 원격 접속 제한
+	if r := exec(c, "grep ^pts /etc/securetty > /dev/null 2>&1", noSudo); r.isSuccess() {
+		util.Log.Warnf("U-01 not tested yet: %s", r)
+		return true, &unknown{}
+	}
+	// U-02- 패스워드 복잡성 설정 : 최대 사용 기간
+	if r := exec(c, "cat /etc/login.defs | grep PASS_MAX_DAYS | awk '{print $2}' | sed '1d'", noSudo); r.isSuccess() {
+		util.Log.Warnf("U-01 not tested yet: %s", r)
+		return true, &unknown{}
+	}
+	// U-02- 패스워드 복잡성 설정 : 최소 사용 기간
+	if r := exec(c, "cat /etc/login.defs | grep PASS_MIN_DAYS | awk '{print $2}' | sed '1d'", noSudo); r.isSuccess() {
+		util.Log.Warnf("U-01 not tested yet: %s", r)
+		return true, &unknown{}
+	}	
+	// U-02- 패스워드 복잡성 설정 : 기간 만료 경고 기간
+	if r := exec(c, "cat /etc/login.defs | grep PASS_WARN_AGE | awk '{print $2}' | sed '1d'", noSudo); r.isSuccess() {
+		util.Log.Warnf("U-01 not tested yet: %s", r)
+		return true, &unknown{}
+	}
+	return nil
+}
+
+
 func (o *debian) detectIPAddr() (err error) {
 	o.ServerInfo.IPv4Addrs, o.ServerInfo.IPv6Addrs, err = o.ip()
 	return err
