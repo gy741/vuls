@@ -528,7 +528,7 @@ func Cce(timeoutSec int) error {
 		return err
 	}
 
-	results, err := GetScanResults(scannedAt, timeoutSec)
+	results, err := GetCceResults(scannedAt, timeoutSec)
 	if err != nil {
 		return err
 	}
@@ -698,7 +698,7 @@ func GetCceResults(scannedAt time.Time, timeoutSec int) (results models.ScanResu
 			if err = o.preCure(); err != nil {
 				return err
 			}
-			if err = o.scanPackages(); err != nil {
+			if err = o.scanCce(); err != nil {
 				return err
 			}
 			if err = o.postScan(); err != nil {
