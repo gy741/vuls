@@ -146,8 +146,7 @@ func (o *debian) checkIfSudoNoPasswd() error {
 	for _, cmd := range cmds {
 		cmd = util.PrependProxyEnv(cmd)
 		o.log.Infof("Checking... sudo %s", cmd)
-		r := o.exec(cmd, sudo)
-		if !r.isSuccess() {
+		if r := o.exec(cmd, sudo); !r.isSuccess() {
 			o.log.Errorf("sudo error on %s", r)
 			return xerrors.Errorf("Failed to sudo: %s", r)
 		}
@@ -157,8 +156,7 @@ func (o *debian) checkIfSudoNoPasswd() error {
 	if initName == upstart && err == nil {
 		cmd := util.PrependProxyEnv("initctl status --help")
 		o.log.Infof("Checking... sudo %s", cmd)
-		r := o.exec(cmd, sudo)
-		if !r.isSuccess() {
+		if r := o.exec(cmd, sudo); !r.isSuccess() {
 			o.log.Errorf("sudo error on %s", r)
 			return xerrors.Errorf("Failed to sudo: %s", r)
 		}
@@ -212,8 +210,7 @@ func (o *debian) checkDeps() error {
 	for _, dep := range deps {
 		cmd := fmt.Sprintf("%s %s", dpkgQuery, dep.packName)
 		msg := fmt.Sprintf("%s is not installed", dep.packName)
-		r := o.exec(cmd, noSudo)
-		if !r.isSuccess() {
+		if r := o.exec(cmd, noSudo); !r.isSuccess() {
 			if dep.additionalMsg != "" {
 				msg += dep.additionalMsg
 			}
@@ -348,8 +345,7 @@ const dpkgQuery = `dpkg-query -W -f="\${binary:Package},\${db:Status-Abbrev},\${
 
 func (o *debian) scanInstalledPackages() (models.Packages, models.Packages, models.SrcPackages, error) {
 	updatable := models.Packages{}
-	r := o.exec(dpkgQuery, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(dpkgQuery, noSudo); !r.isSuccess() {
 		return nil, nil, nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 
@@ -569,8 +565,7 @@ func (o *debian) fillCandidateVersion(updatables models.Packages) (err error) {
 		names = append(names, name)
 	}
 	cmd := fmt.Sprintf("LANGUAGE=en_US.UTF-8 apt-cache policy %s", strings.Join(names, " "))
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	packAptPolicy := o.splitAptCachePolicy(r.Stdout)
@@ -592,8 +587,7 @@ func (o *debian) fillCandidateVersion(updatables models.Packages) (err error) {
 
 func (o *debian) getUpdatablePackNames() (packNames []string, err error) {
 	cmd := util.PrependProxyEnv("LANGUAGE=en_US.UTF-8 apt-get dist-upgrade --dry-run")
-	r := o.exec(cmd, noSudo)
-	if r.isSuccess(0, 1) {
+	if r := o.exec(cmd, noSudo); r.isSuccess(0, 1) {
 		return o.parseAptGetUpgrade(r.Stdout)
 	}
 	return packNames, xerrors.Errorf(
@@ -651,8 +645,7 @@ func (o *debian) makeTempChangelogDir() (string, error) {
 	path := "/tmp/vuls-" + suffix
 	cmd := fmt.Sprintf(`mkdir -p %s`, path)
 	cmd = util.PrependProxyEnv(cmd)
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to create directory to save changelog for Raspbian. cmd: %s, status: %d, stdout: %s, stderr: %s", cmd, r.ExitStatus, r.Stdout, r.Stderr)
 	}
 	return path, nil
@@ -669,8 +662,7 @@ func generateSuffix() (string, error) {
 func (o *debian) deleteTempChangelogDir(tmpClogPath string) error {
 	cmd := fmt.Sprintf(`rm -rf %s`, tmpClogPath)
 	cmd = util.PrependProxyEnv(cmd)
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return xerrors.Errorf("Failed to delete directory to save changelog for Raspbian. cmd: %s, status: %d, stdout: %s, stderr: %s", cmd, r.ExitStatus, r.Stdout, r.Stderr)
 	}
 	return nil
@@ -837,8 +829,7 @@ func (o *debian) fetchParseChangelog(pack models.Package, tmpClogPath string) ([
 	}
 	cmd = util.PrependProxyEnv(cmd)
 
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		o.log.Warnf("Failed to SSH: %s", r)
 		// Ignore this Error.
 		return nil, nil, nil
@@ -863,15 +854,13 @@ func (o *debian) getChangelogPath(packName, tmpClogPath string) (string, error) 
 	// `apt download` downloads deb package to current directory
 	cmd := fmt.Sprintf(`cd %s && apt download %s`, tmpClogPath, packName)
 	cmd = util.PrependProxyEnv(cmd)
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to Fetch deb package. cmd: %s, status: %d, stdout: %s, stderr: %s", cmd, r.ExitStatus, r.Stdout, r.Stderr)
 	}
 
 	cmd = fmt.Sprintf(`find %s -name "%s_*.deb"`, tmpClogPath, packName)
 	cmd = util.PrependProxyEnv(cmd)
-	r = o.exec(cmd, noSudo)
-	if !r.isSuccess() || r.Stdout == "" {
+	if r = o.exec(cmd, noSudo); !r.isSuccess() || r.Stdout == "" {
 		return "", xerrors.Errorf("Failed to find deb package. cmd: %s, status: %d, stdout: %s, stderr: %s", cmd, r.ExitStatus, r.Stdout, r.Stderr)
 	}
 
@@ -879,8 +868,7 @@ func (o *debian) getChangelogPath(packName, tmpClogPath string) (string, error) 
 	packChangelogDir := strings.Split(r.Stdout, ".deb")[0]
 	cmd = fmt.Sprintf(`dpkg-deb -x %s.deb %s`, packChangelogDir, packChangelogDir)
 	cmd = util.PrependProxyEnv(cmd)
-	r = o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r = o.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to dpkg-deb. cmd: %s, status: %d, stdout: %s, stderr: %s", cmd, r.ExitStatus, r.Stdout, r.Stderr)
 	}
 
@@ -888,8 +876,7 @@ func (o *debian) getChangelogPath(packName, tmpClogPath string) (string, error) 
 	changelogDocDir := fmt.Sprintf("%s/usr/share/doc/%s", packChangelogDir, packName)
 	cmd = fmt.Sprintf(`test -L %s && readlink --no-newline %s`, changelogDocDir, changelogDocDir)
 	cmd = util.PrependProxyEnv(cmd)
-	r = o.exec(cmd, noSudo)
-	if r.isSuccess() {
+	if r = o.exec(cmd, noSudo); r.isSuccess() {
 		return o.getChangelogPath(r.Stdout, tmpClogPath)
 	}
 
@@ -897,8 +884,7 @@ func (o *debian) getChangelogPath(packName, tmpClogPath string) (string, error) 
 	packChangelogPath := fmt.Sprintf("%s/changelog.Debian.gz", changelogDocDir)
 	cmd = fmt.Sprintf(`test -e %s`, packChangelogPath)
 	cmd = util.PrependProxyEnv(cmd)
-	r = o.exec(cmd, noSudo)
-	if r.isSuccess() {
+	if r = o.exec(cmd, noSudo); r.isSuccess() {
 		return packChangelogPath, nil
 	}
 	results["changelog.Debian.gz"] = r
@@ -906,8 +892,7 @@ func (o *debian) getChangelogPath(packName, tmpClogPath string) (string, error) 
 	packChangelogPath = fmt.Sprintf("%s/changelog.gz", changelogDocDir)
 	cmd = fmt.Sprintf(`test -e %s`, packChangelogPath)
 	cmd = util.PrependProxyEnv(cmd)
-	r = o.exec(cmd, noSudo)
-	if r.isSuccess() {
+	if r = o.exec(cmd, noSudo); r.isSuccess() {
 		return packChangelogPath, nil
 	}
 	results["changelog.gz"] = r
@@ -1129,8 +1114,7 @@ func (o *debian) checkrestart() error {
 	}
 
 	cmd := "LANGUAGE=en_US.UTF-8 checkrestart"
-	r := o.exec(cmd, sudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, sudo); !r.isSuccess() {
 		return xerrors.Errorf(
 			"Failed to %s. status: %d, stdout: %s, stderr: %s",
 			cmd, r.ExitStatus, r.Stdout, r.Stderr)
@@ -1140,8 +1124,7 @@ func (o *debian) checkrestart() error {
 	if initName == upstart {
 		for _, s := range unknownServices {
 			cmd := "LANGUAGE=en_US.UTF-8 initctl status " + s
-			r := o.exec(cmd, sudo)
-			if !r.isSuccess() {
+			if r := o.exec(cmd, sudo); !r.isSuccess() {
 				continue
 			}
 			if ss := strings.Fields(r.Stdout); len(ss) == 4 && ss[2] == "process" {
@@ -1338,8 +1321,7 @@ func (o *debian) dpkgPs() error {
 
 func (o *debian) getPkgName(paths []string) (pkgNames []string, err error) {
 	cmd := "dpkg -S " + strings.Join(paths, " ")
-	r := o.exec(util.PrependProxyEnv(cmd), noSudo)
-	if !r.isSuccess(0, 1) {
+	if r := o.exec(util.PrependProxyEnv(cmd), noSudo); !r.isSuccess(0, 1) {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return o.parseGetPkgName(r.Stdout), nil

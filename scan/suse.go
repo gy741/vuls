@@ -149,8 +149,7 @@ func (o *suse) scanPackages() error {
 }
 
 func (o *suse) rebootRequired() (bool, error) {
-	r := o.exec("rpm -q --last kernel-default", noSudo)
-	if !r.isSuccess() {
+	if r := o.exec("rpm -q --last kernel-default", noSudo); !r.isSuccess() {
 		o.log.Warnf("Failed to detect the last installed kernel : %v", r)
 		// continue scanning
 		return false, nil
@@ -164,8 +163,7 @@ func (o *suse) scanUpdatablePackages() (models.Packages, error) {
 	if o.hasZypperColorOption() {
 		cmd = "zypper -q --no-color lu"
 	}
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to scan updatable packages: %v", r)
 	}
 	return o.parseZypperLULines(r.Stdout)

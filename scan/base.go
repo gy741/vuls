@@ -79,16 +79,14 @@ func (l *base) getPlatform() models.Platform {
 }
 
 func (l *base) runningKernel() (release, version string, err error) {
-	r := l.exec("uname -r", noSudo)
-	if !r.isSuccess() {
+	if r := l.exec("uname -r", noSudo); !r.isSuccess() {
 		return "", "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	release = strings.TrimSpace(r.Stdout)
 
 	switch l.Distro.Family {
 	case config.Debian:
-		r := l.exec("uname -a", noSudo)
-		if !r.isSuccess() {
+		if r := l.exec("uname -a", noSudo); !r.isSuccess() {
 			return "", "", xerrors.Errorf("Failed to SSH: %s", r)
 		}
 		ss := strings.Fields(r.Stdout)
@@ -179,8 +177,7 @@ func (l *base) exitedContainers() (containers []config.Container, err error) {
 
 func (l *base) dockerPs(option string) (string, error) {
 	cmd := fmt.Sprintf("docker ps %s", option)
-	r := l.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := l.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -188,8 +185,7 @@ func (l *base) dockerPs(option string) (string, error) {
 
 func (l *base) lxdPs(option string) (string, error) {
 	cmd := fmt.Sprintf("lxc list %s", option)
-	r := l.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := l.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -197,8 +193,7 @@ func (l *base) lxdPs(option string) (string, error) {
 
 func (l *base) lxcPs(option string) (string, error) {
 	cmd := fmt.Sprintf("lxc-ls %s 2>/dev/null", option)
-	r := l.exec(cmd, sudo)
-	if !r.isSuccess() {
+	if r := l.exec(cmd, sudo); !r.isSuccess() {
 		return "", xerrors.Errorf("failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -265,8 +260,7 @@ func (l *base) ip() ([]string, []string, error) {
 	// 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000\    link/ether 52:54:00:2a:86:4c brd ff:ff:ff:ff:ff:ff
 	// 2: eth0    inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
 	// 2: eth0    inet6 fe80::5054:ff:fe2a:864c/64 scope link \       valid_lft forever preferred_lft forever
-	r := l.exec("/sbin/ip -o addr", noSudo)
-	if !r.isSuccess() {
+	if r := l.exec("/sbin/ip -o addr", noSudo); !r.isSuccess() {
 		return nil, nil, xerrors.Errorf("Failed to detect IP address: %v", r)
 	}
 	ipv4Addrs, ipv6Addrs := l.parseIP(r.Stdout)
@@ -327,8 +321,7 @@ func (l *base) detectDeepSecurity() (fingerprint string, err error) {
 	if l.getServerInfo().Mode.IsFastRoot() {
 		if r := l.exec("test -f /opt/ds_agent/dsa_query", sudo); r.isSuccess() {
 			cmd := fmt.Sprintf(`/opt/ds_agent/dsa_query -c "GetAgentStatus" | grep %q`, dsFingerPrintPrefix)
-			r := l.exec(cmd, sudo)
-			if r.isSuccess() {
+			if r := l.exec(cmd, sudo); r.isSuccess() {
 				line := strings.TrimSpace(r.Stdout)
 				return line[len(dsFingerPrintPrefix):], nil
 			}
@@ -356,8 +349,7 @@ func (l *base) detectIPSs() {
 func (l *base) detectRunningOnAws() (ok bool, instanceID string, err error) {
 	if r := l.exec("type curl", noSudo); r.isSuccess() {
 		cmd := "curl --max-time 1 --noproxy 169.254.169.254 http://169.254.169.254/latest/meta-data/instance-id"
-		r := l.exec(cmd, noSudo)
-		if r.isSuccess() {
+		if r := l.exec(cmd, noSudo); r.isSuccess() {
 			id := strings.TrimSpace(r.Stdout)
 			if !l.isAwsInstanceID(id) {
 				return false, "", nil
@@ -376,8 +368,7 @@ func (l *base) detectRunningOnAws() (ok bool, instanceID string, err error) {
 
 	if r := l.exec("type wget", noSudo); r.isSuccess() {
 		cmd := "wget --tries=3 --timeout=1 --no-proxy -q -O - http://169.254.169.254/latest/meta-data/instance-id"
-		r := l.exec(cmd, noSudo)
-		if r.isSuccess() {
+		if r := l.exec(cmd, noSudo); r.isSuccess() {
 			id := strings.TrimSpace(r.Stdout)
 			if !l.isAwsInstanceID(id) {
 				return false, "", nil
@@ -475,8 +466,7 @@ const (
 func (l *base) detectInitSystem() (string, error) {
 	var f func(string) (string, error)
 	f = func(cmd string) (string, error) {
-		r := l.exec(cmd, sudo)
-		if !r.isSuccess() {
+		if r := l.exec(cmd, sudo); !r.isSuccess() {
 			return "", xerrors.Errorf("Failed to stat %s: %s", cmd, r)
 		}
 		scanner := bufio.NewScanner(strings.NewReader(r.Stdout))
@@ -491,8 +481,7 @@ func (l *base) detectInitSystem() (string, error) {
 			return f("stat /sbin/init")
 		} else if line == "File: ‘/sbin/init’" ||
 			line == "File: `/sbin/init'" {
-			r := l.exec("/sbin/init --version", noSudo)
-			if r.isSuccess() {
+			if r := l.exec("/sbin/init --version", noSudo); r.isSuccess() {
 				if strings.Contains(r.Stdout, "upstart") {
 					return upstart, nil
 				}
@@ -506,8 +495,7 @@ func (l *base) detectInitSystem() (string, error) {
 
 func (l *base) detectServiceName(pid string) (string, error) {
 	cmd := fmt.Sprintf("systemctl status --quiet --no-pager %s", pid)
-	r := l.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := l.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to stat %s: %s", cmd, r)
 	}
 	return l.parseSystemctlStatus(r.Stdout), nil
@@ -573,8 +561,7 @@ func (l *base) scanLibraries() (err error) {
 			}
 		default:
 			cmd := fmt.Sprintf("cat %s", path)
-			r := exec(l.ServerInfo, cmd, noSudo)
-			if !r.isSuccess() {
+			if r := exec(l.ServerInfo, cmd, noSudo); !r.isSuccess() {
 				return xerrors.Errorf("Failed to get target file: %s, filepath: %s", r, path)
 			}
 			bytes = []byte(r.Stdout)
@@ -681,8 +668,7 @@ func (l *base) detectWpCore() (string, error) {
 		l.ServerInfo.WordPress.CmdPath,
 		l.ServerInfo.WordPress.DocRoot)
 
-	r := exec(l.ServerInfo, cmd, noSudo)
-	if !r.isSuccess() {
+	if r := exec(l.ServerInfo, cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to get wp core version: %s", r)
 	}
 	return strings.TrimSpace(r.Stdout), nil
@@ -695,8 +681,7 @@ func (l *base) detectWpThemes() ([]models.WpPackage, error) {
 		l.ServerInfo.WordPress.DocRoot)
 
 	var themes []models.WpPackage
-	r := exec(l.ServerInfo, cmd, noSudo)
-	if !r.isSuccess() {
+	if r := exec(l.ServerInfo, cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to get a list of WordPress plugins: %s", r)
 	}
 	err := json.Unmarshal([]byte(r.Stdout), &themes)
@@ -716,8 +701,7 @@ func (l *base) detectWpPlugins() ([]models.WpPackage, error) {
 		l.ServerInfo.WordPress.DocRoot)
 
 	var plugins []models.WpPackage
-	r := exec(l.ServerInfo, cmd, noSudo)
-	if !r.isSuccess() {
+	if r := exec(l.ServerInfo, cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to wp plugin list: %s", r)
 	}
 	if err := json.Unmarshal([]byte(r.Stdout), &plugins); err != nil {
@@ -838,8 +822,7 @@ func (l *base) findPortScanSuccessOn(listenIPPorts []string, searchListenPort mo
 
 func (l *base) ps() (stdout string, err error) {
 	cmd := `LANGUAGE=en_US.UTF-8 ps --no-headers --ppid 2 -p 2 --deselect -o pid,comm`
-	r := l.exec(util.PrependProxyEnv(cmd), noSudo)
-	if !r.isSuccess() {
+	if r := l.exec(util.PrependProxyEnv(cmd), noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -861,8 +844,7 @@ func (l *base) parsePs(stdout string) map[string]string {
 
 func (l *base) lsProcExe(pid string) (stdout string, err error) {
 	cmd := fmt.Sprintf("ls -l /proc/%s/exe", pid)
-	r := l.exec(util.PrependProxyEnv(cmd), sudo)
-	if !r.isSuccess() {
+	if r := l.exec(util.PrependProxyEnv(cmd), sudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -878,8 +860,7 @@ func (l *base) parseLsProcExe(stdout string) (string, error) {
 
 func (l *base) grepProcMap(pid string) (stdout string, err error) {
 	cmd := fmt.Sprintf(`cat /proc/%s/maps 2>/dev/null | grep -v " 00:00 " | awk '{print $6}' | sort -n | uniq`, pid)
-	r := l.exec(util.PrependProxyEnv(cmd), sudo)
-	if !r.isSuccess() {
+	if r := l.exec(util.PrependProxyEnv(cmd), sudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return r.Stdout, nil
@@ -896,8 +877,7 @@ func (l *base) parseGrepProcMap(stdout string) (soPaths []string) {
 
 func (l *base) lsOfListen() (stdout string, err error) {
 	cmd := `lsof -i -P -n | grep LISTEN`
-	r := l.exec(util.PrependProxyEnv(cmd), sudo)
-	if !r.isSuccess(0, 1) {
+	if r := l.exec(util.PrependProxyEnv(cmd), sudo); !r.isSuccess(0, 1) {
 		return "", xerrors.Errorf("Failed to lsof: %s", r)
 	}
 	return r.Stdout, nil

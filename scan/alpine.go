@@ -65,8 +65,7 @@ func (o *alpine) apkUpdate() error {
 	if o.getServerInfo().Mode.IsOffline() {
 		return nil
 	}
-	r := o.exec("apk update", noSudo)
-	if !r.isSuccess() {
+	if r := o.exec("apk update", noSudo); !r.isSuccess() {
 		return xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return nil
@@ -128,8 +127,7 @@ func (o *alpine) scanPackages() error {
 
 func (o *alpine) scanInstalledPackages() (models.Packages, error) {
 	cmd := util.PrependProxyEnv("apk info -v")
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return o.parseApkInfo(r.Stdout)
@@ -163,8 +161,7 @@ func (o *alpine) parseApkInfo(stdout string) (models.Packages, error) {
 
 func (o *alpine) scanUpdatablePackages() (models.Packages, error) {
 	cmd := util.PrependProxyEnv("apk version")
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return o.parseApkVersion(r.Stdout)

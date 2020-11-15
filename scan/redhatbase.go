@@ -139,8 +139,7 @@ func (o *redhatBase) execCheckIfSudoNoPasswd(cmds []cmd) error {
 	for _, c := range cmds {
 		cmd := util.PrependProxyEnv(c.cmd)
 		o.log.Infof("Checking... sudo %s", cmd)
-		r := o.exec(util.PrependProxyEnv(cmd), sudo)
-		if !r.isSuccess(c.expectedStatusCodes...) {
+		if r := o.exec(util.PrependProxyEnv(cmd), sudo); !r.isSuccess(c.expectedStatusCodes...) {
 			o.log.Errorf("Check sudo or proxy settings: %s", r)
 			return xerrors.Errorf("Failed to sudo: %s", r)
 		}
@@ -261,8 +260,7 @@ func (o *redhatBase) scanInstalledPackages() (models.Packages, error) {
 		Version: version,
 	}
 
-	r := o.exec(o.rpmQa(o.Distro), noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(o.rpmQa(o.Distro), noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Scan packages failed: %s", r)
 	}
 	installed, _, err := o.parseInstalledPackages(r.Stdout)
@@ -335,8 +333,7 @@ func (o *redhatBase) parseInstalledPackagesLine(line string) (models.Package, er
 
 func (o *redhatBase) yumMakeCache() error {
 	cmd := `yum makecache --assumeyes`
-	r := o.exec(util.PrependProxyEnv(cmd), o.sudo.yumMakeCache())
-	if !r.isSuccess(0, 1) {
+	if r := o.exec(util.PrependProxyEnv(cmd), o.sudo.yumMakeCache()); !r.isSuccess(0, 1) {
 		return xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return nil
@@ -356,8 +353,7 @@ func (o *redhatBase) scanUpdatablePackages() (models.Packages, error) {
 		cmd += " --enablerepo=" + repo
 	}
 
-	r := o.exec(util.PrependProxyEnv(cmd), o.sudo.repoquery())
-	if !r.isSuccess() {
+	if r := o.exec(util.PrependProxyEnv(cmd), o.sudo.repoquery()); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 
@@ -546,8 +542,7 @@ func (o *redhatBase) needsRestarting() error {
 	}
 
 	cmd := "LANGUAGE=en_US.UTF-8 needs-restarting"
-	r := o.exec(cmd, sudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, sudo); !r.isSuccess() {
 		return xerrors.Errorf("Failed to SSH: %w", r)
 	}
 	procs := o.parseNeedsRestarting(r.Stdout)
@@ -599,8 +594,7 @@ func (o *redhatBase) parseNeedsRestarting(stdout string) (procs []models.NeedRes
 			// [ec2-user@ip-172-31-11-139 ~]$ type -p auditd
 			// /sbin/auditd
 			cmd := fmt.Sprintf("LANGUAGE=en_US.UTF-8 which %s", path)
-			r := o.exec(cmd, sudo)
-			if !r.isSuccess() {
+			if r := o.exec(cmd, sudo); !r.isSuccess() {
 				o.log.Warnf("Failed to exec which %s: %s", path, r)
 				continue
 			}
@@ -621,8 +615,7 @@ func (o *redhatBase) procPathToFQPN(execCommand string) (string, error) {
 	execCommand = strings.Replace(execCommand, "\x00", " ", -1) // for CentOS6.9
 	path := strings.Fields(execCommand)[0]
 	cmd := `LANGUAGE=en_US.UTF-8 rpm -qf --queryformat "%{NAME}-%{EPOCH}:%{VERSION}-%{RELEASE}.%{ARCH}\n" ` + path
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return "", xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	fqpn := strings.TrimSpace(r.Stdout)
@@ -631,8 +624,7 @@ func (o *redhatBase) procPathToFQPN(execCommand string) (string, error) {
 
 func (o *redhatBase) getPkgName(paths []string) (pkgNames []string, err error) {
 	cmd := o.rpmQf(o.Distro) + strings.Join(paths, " ")
-	r := o.exec(util.PrependProxyEnv(cmd), noSudo)
-	if !r.isSuccess(0, 2, 4, 8) {
+	if r := o.exec(util.PrependProxyEnv(cmd), noSudo); !r.isSuccess(0, 2, 4, 8) {
 		return nil, xerrors.Errorf("Failed to rpm -qf: %s, cmd: %s", r, cmd)
 	}
 

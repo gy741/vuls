@@ -82,8 +82,7 @@ func (o *bsd) postScan() error {
 }
 
 func (o *bsd) detectIPAddr() (err error) {
-	r := o.exec("/sbin/ifconfig", noSudo)
-	if !r.isSuccess() {
+	if r := o.exec("/sbin/ifconfig", noSudo); !r.isSuccess() {
 		return xerrors.Errorf("Failed to detect IP address: %v", r)
 	}
 	o.ServerInfo.IPv4Addrs, o.ServerInfo.IPv6Addrs = o.parseIfconfig(r.Stdout)
@@ -155,8 +154,7 @@ func (o *bsd) parseInstalledPackages(string) (models.Packages, models.SrcPackage
 }
 
 func (o *bsd) rebootRequired() (bool, error) {
-	r := o.exec("freebsd-version -k", noSudo)
-	if !r.isSuccess() {
+	if r := o.exec("freebsd-version -k", noSudo); !r.isSuccess() {
 		return false, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	return o.Kernel.Release != strings.TrimSpace(r.Stdout), nil
@@ -165,15 +163,13 @@ func (o *bsd) rebootRequired() (bool, error) {
 func (o *bsd) scanInstalledPackages() (models.Packages, error) {
 	// https://github.com/future-architect/vuls/issues/1042
 	cmd := util.PrependProxyEnv("pkg info")
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r := o.exec(cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	pkgs := o.parsePkgInfo(r.Stdout)
 
 	cmd = util.PrependProxyEnv("pkg version -v")
-	r = o.exec(cmd, noSudo)
-	if !r.isSuccess() {
+	if r = o.exec(cmd, noSudo); !r.isSuccess() {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	// `pkg-audit` has a new version, overwrite it.
@@ -186,14 +182,12 @@ func (o *bsd) scanInstalledPackages() (models.Packages, error) {
 func (o *bsd) scanUnsecurePackages() (models.VulnInfos, error) {
 	const vulndbPath = "/tmp/vuln.db"
 	cmd := "rm -f " + vulndbPath
-	r := o.exec(cmd, noSudo)
-	if !r.isSuccess(0) {
+	if r := o.exec(cmd, noSudo); !r.isSuccess(0) {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 
 	cmd = util.PrependProxyEnv("pkg audit -F -r -f " + vulndbPath)
-	r = o.exec(cmd, noSudo)
-	if !r.isSuccess(0, 1) {
+	if r = o.exec(cmd, noSudo); !r.isSuccess(0, 1) {
 		return nil, xerrors.Errorf("Failed to SSH: %s", r)
 	}
 	if r.ExitStatus == 0 {
